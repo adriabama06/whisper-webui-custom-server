@@ -38,8 +38,8 @@ usecase_option = st.selectbox(
 )
 
 st.subheader("Audio file", divider=True)
-audio_file = st.file_uploader('Choose an audio file', type=["flac", "m4a", "mp3", "mp4", "mpeg", "mpga", "oga", "ogg", "wav", "webm"])
-st.markdown('[How to handle file bigger than 25mb?](https://platform.openai.com/docs/guides/speech-to-text/longer-inputs)')
+audio_file = st.file_uploader('Choose an audio file', type=["flac", "m4a", "mp3", "mp4", "mpeg", "mpga", "oga", "ogg", "wav", "webm", "opus", "aac", "ac3", "aiff"])
+st.markdown('[How to handle file bigger than 25mb?](https://platform.openai.com/docs/guides/speech-to-text/longer-inputs) *Note: This code has enabled up to 1GB limit and support for `.opus, .aac, .ac3, .aiff` because I use this code in combination with [whisper.cpp-server-docker](https://github.com/adriabama06/whisper.cpp-server-docker) that uses Ffmpeg*')
 
 st.subheader("Option customization", divider=True)
 if usecase_option == "Create transcription":
