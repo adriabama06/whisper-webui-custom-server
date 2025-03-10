@@ -1,3 +1,4 @@
+import os
 import re
 import streamlit as st
 from openai import OpenAI
@@ -6,8 +7,26 @@ from iso_639_languages import iso_639_languages
 st.set_page_config(layout="wide")
 
 with st.sidebar:
-    openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
+    openai_api_key = st.text_input(
+        "OpenAI API Key",
+        key="chatbot_api_key",
+        type="password",
+        help="Enter your OpenAI API key. The key is not stored and is only used for this session.",
+        value=os.getenv("OPENAI_API_KEY", "")
+    )
     "[How to get an OpenAI API key?](https://platform.openai.com/account/api-keys)"
+    custom_api_base = st.text_input(
+        "Custom OpenAI Server URL (Optional)",
+        key="custom_api_base",
+        help="Leave empty to use default OpenAI servers",
+        value=os.getenv("CUSTOM_API_BASE", "")
+    )
+    custom_model = st.text_input(
+        "Custom Model (Optional)",
+        key="custom_model",
+        help="Enter custom model name if different from 'whisper-1'",
+        value=os.getenv("CUSTOM_MODEL", "whisper-1")
+    )
 
 st.header('Whisper WebUI', divider='violet')
 st.caption('created by Education Victory')
@@ -38,7 +57,6 @@ if usecase_option == "Create transcription":
         prompt = st.text_input("Prompt (Optional)", "")
         st.caption("An optional text to guide the model's style or continue a previous audio segment. The prompt should match the audio language. **For example, 'Generate transcription for this meeting audio'**")
 
-
     with col3:
         format_option = st.selectbox(
             "Output Format (Optional):",
@@ -52,13 +70,15 @@ if usecase_option == "Create transcription":
             st.stop()
         # Button to start transcription
         if st.button('Transcribe Audio'):
-            # Set the OpenAI API key
-            client = OpenAI(api_key=openai_api_key)
-
+            # Set the OpenAI API key and custom server (if provided)
+            if custom_api_base:
+                client = OpenAI(api_key=openai_api_key, base_url=custom_api_base)
+            else:
+                client = OpenAI(api_key=openai_api_key)
             # Call the OpenAI API for transcription
             with st.spinner('Processing...'):
                 transcription = client.audio.transcriptions.create(
-                    model="whisper-1",
+                    model=custom_model if custom_model else "whisper-1",
                     file=audio_file,
                     language=language_code,
                     prompt=prompt,
@@ -98,15 +118,17 @@ elif usecase_option == "Create translation":
         if not openai_api_key:
             st.info("Please add your OpenAI API key in the sidebar to continue.")
             st.stop()
-        # Button to start transcription
+        # Button to start translation
         if st.button('Translation Audio'):
-            # Set the OpenAI API key
-            client = OpenAI(api_key=openai_api_key)
-
-            # Call the OpenAI API for transcription
+            # Set the OpenAI API key and custom server (if provided)
+            if custom_api_base:
+                client = OpenAI(api_key=openai_api_key, base_url=custom_api_base)
+            else:
+                client = OpenAI(api_key=openai_api_key)
+            # Call the OpenAI API for translation
             with st.spinner('Processing...'):
                 translation = client.audio.translations.create(
-                    model="whisper-1",
+                    model=custom_model if custom_model else "whisper-1",
                     file=audio_file,
                     prompt=prompt,
                     response_format=format_option,

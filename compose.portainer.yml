@@ -1,0 +1,13 @@
+services:
+  webui:
+    build: .
+    ports:
+      - "${PORT:-8501}:8501"
+    volumes:
+      - ./:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+      - CUSTOM_API_BASE=$CUSTOM_API_BASE
+      - CUSTOM_MODEL=$CUSTOM_MODEL
+    restart: unless-stopped
