@@ -1,6 +1,7 @@
 services:
   webui:
     build: .
+    image: adriabama06/whisper-webui-custom-server:latest
     ports:
       - "8501:8501"
     volumes:
